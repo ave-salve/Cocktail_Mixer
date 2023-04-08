@@ -34,15 +34,14 @@ Ingrediant::~Ingrediant()
 using List = std::vector<Ingrediant>;
 
 
-// randomness als reference
-Ingrediant read_input(){}
 
-List read_ingreds_txt(){}
+Ingrediant read_input(){}
 
 //returns a Vector of possible ingrediants to add to the drink. Sorted from most to least fitting
 List sort_ingreds(List& ingrediants, List& drink, Ingrediant& input)
 {
-    // Sam does his magic
+    Ingrediant Drink{}
+    
 }
 
 // post: vector of probabilities (e^{-ax_i})
@@ -56,6 +55,9 @@ List select_ingreds(List& ingrediants, Ingrediant& input){
         // call make_dist
         // radnom generator -> choose ingrediant
         // subtract volume
+
+
+
 
     }
 }
