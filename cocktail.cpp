@@ -59,7 +59,7 @@ std::vector<double> make_dist(int n_ingreds, int randomness){
 }
 
 List select_ingreds(List& ingrediants, Ingrediant& input){
-    while(input.max_amount_cL > 0){
+    while(input.amount > 0){
         // call sort_ingreds
         // call make_dist
         // radnom generator -> choose ingrediant
