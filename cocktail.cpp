@@ -35,7 +35,10 @@ using List = std::vector<Ingrediant>;
 
 
 // randomness als reference
-Ingrediant read_input(){}
+Ingrediant read_input(){
+    Ingrediant tmp;
+    return tmp;
+}
 
 List read_ingreds_txt(){}
 
@@ -46,8 +49,13 @@ List sort_ingreds(List& ingrediants, List& drink, Ingrediant& input)
 }
 
 // post: vector of probabilities (e^{-ax_i})
-std::vector<double> make_dist(int n_ingreds, int randomness){
-    // see notizblatt
+std::vector<double> make_dist(int n_ingreds, bool randomness){
+    std::vector<double> dist;
+    double alpha = randomness*0.5*n_ingreds;
+    for(int i = 0; i < n_ingreds; i++){
+        dist.push_back(exp(-alpha*i/(n_ingreds-1)));
+    }
+    return dist;
 }
 
 List select_ingreds(List& ingrediants, Ingrediant& input){
@@ -78,6 +86,12 @@ int main()
     // random generator
 
     // create name
+
+    srand(1);
+    std::cout << rand() << rand() << rand() << rand() << rand() << rand() << std::endl;
+
+    srand(1);
+    std::cout << rand() << rand() << rand() << rand() << rand() << rand();
 
     return 0;
 }
