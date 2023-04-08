@@ -56,6 +56,12 @@ List sort_ingreds(List& ingrediants, List& drink, Ingrediant& input)
         Drink.co2 += i.co2/drink.size();
         Drink.cost_permax += i.bitter/drink.size();
     }
+}
+
+//returns a Vector of possible ingrediants to add to the drink. Sorted from most to least fitting
+List sort_ingreds(List& ingrediants, List& drink, Ingrediant& input)
+{
+    
     
 }
 
