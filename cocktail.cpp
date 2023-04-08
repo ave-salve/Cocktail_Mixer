@@ -8,7 +8,7 @@ public:
     double max_amount_cL; // cL, 0 heisst unlimitiert
     bool co2;
     double viscosity;
-    double cost_permax;
+    double cost_permax; // HÖHÖ, ich hoff es hät funkitoniert?? mal luege
 
     // colour
 
