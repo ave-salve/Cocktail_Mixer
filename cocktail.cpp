@@ -2,7 +2,7 @@ struct Ingrediant
 {
 public:
     double alk; // prozent alkohol
-    double sweet;
+    double sweet;   //Test Git
     double bitter;
     double sour;
     double max_amount_cL; // cL, 0 heisst unlimitiert
