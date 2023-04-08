@@ -58,9 +58,6 @@ List sort_ingreds(List& ingrediants, List& drink, Ingrediant& input)
     }
 }
 
-//returns a Vector of possible ingrediants to add to the drink. Sorted from most to least fitting
-List sort_ingreds(List& ingrediants, List& drink, Ingrediant& input)
-{
     
     
 }
