@@ -60,7 +60,6 @@ List sort_ingreds(List& ingrediants, List& drink, Ingrediant& input)
 
     
     
-}
 
 // post: vector of probabilities (e^{-ax_i})
 std::vector<double> make_dist(int n_ingreds, bool randomness){
