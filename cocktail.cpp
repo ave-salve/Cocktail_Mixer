@@ -11,21 +11,23 @@ struct Ingrediant
 {
 public:
     // default: value between 0, 1
-
+    std::string name;
     double alk; // prozent alkohol
-    double sweet;
-    double bitter;
-    double sour;
-    double viscosity;
-    double amount; 
-    double co2; 
+    double amount;
     double cost_permax; // in CHF
+
+    double sweet;
+    double sour;
+    double bitter;
+
+    double co2;
+    double viscosity;
     double randomness;
-    // only for input:
-    int n;
     // colour
 
-    std::string name;
+    // only for input:
+    int n;
+
 
     Ingrediant();
     ~Ingrediant();
@@ -47,7 +49,38 @@ Ingrediant read_input(){
     return tmp;
 }
 
-List read_ingreds_txt(){}
+List read_ingreds_txt(){
+    std::ifstream stream_ingr;
+    stream_ingr.open("ingredients.txt");
+    assert(stream_ingr.is_open());
+    std::string skip;
+    while(stream_ingr >> skip && !(skip == "#"));
+
+    List ingrediants;
+    
+
+    std::string tmp;
+    while(stream_ingr >> tmp){
+        Ingrediant new_one;
+        new_one.name = tmp;
+        stream_ingr >> new_one.alk;
+        stream_ingr >> new_one.amount;
+        stream_ingr >> new_one.cost_permax;
+
+        stream_ingr >> new_one.sweet;
+        stream_ingr >> new_one.sour;
+        stream_ingr >> new_one.bitter;
+        
+        stream_ingr >> new_one.co2;
+        stream_ingr >> new_one.viscosity;
+        stream_ingr >> new_one.randomness;
+
+        ingrediants.push_back(new_one);
+        std::cout << new_one.name << std::endl;
+    }
+
+    return ingrediants;
+}
 
 Ingrediant average_drink(List& drink){
     Ingrediant average;
@@ -131,22 +164,12 @@ void print_drink(List drink){}
 
 int main()
 {
+    read_ingreds_txt();
+
     // desired drink: colour, volume, alkohol
     Ingrediant input = read_input();
     List ingrediants; // read all ingrediants from extra file
     srand(time(0)); // start randomizer
-
-    // random generator
-
-    // create name
-
-
- 
-
-
-
-    //test sam
-
 
     return 0;
 }
