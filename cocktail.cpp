@@ -3,6 +3,8 @@
 #include <string>
 #include <cmath>
 #include <fstream>
+#include <ctime>
+#include <cassert>
 
 
 struct Ingrediant
@@ -20,6 +22,8 @@ public:
     double cost_permax; // in CHF
     // colour
     double randomness;
+    // only for input:
+    int n;
 
     Ingrediant();
     ~Ingrediant();
@@ -35,7 +39,7 @@ using List = std::vector<Ingrediant>;
 
 
 
-
+// todo
 Ingrediant read_input(){
     Ingrediant tmp;
     return tmp;
@@ -70,16 +74,29 @@ std::vector<double> make_dist(int n_ingreds, bool randomness){
 }
 
 List select_ingreds(List& ingrediants, Ingrediant& input){
+    List drink;
     while(input.amount > 0){
         // call sort_ingreds
+        List possible_ingreds = sort_ingreds(ingrediants, drink, input);
         // call make_dist
+        std::vector<double> distribution = make_dist(possible_ingreds.size(), input.randomness);
+        // compute distribution integral
+        double integral = 0;
+        for(auto i : distribution){integral += i; }
         // radnom generator -> choose ingrediant
-        // subtract volume
-
-
-
-
+        double rand_position = (double)rand()*integral/RAND_MAX;
+        double sum_till_now;
+        for(int i = 0; i < distribution.size(); i++){
+            sum_till_now += distribution.at(i);
+            if(rand_position < sum_till_now){
+                drink.push_back(possible_ingreds.at(i));
+                input.amount -= possible_ingreds.at(i).amount;
+                break;
+            }
+        }
     }
+
+    return drink;
 }
 
 std::string give_name(List drink){
@@ -96,16 +113,16 @@ int main()
 {
     // desired drink: colour, volume, alkohol
     Ingrediant input = read_input();
+    List ingrediants; // read all ingrediants from extra file
+    srand(time(0)); // start randomizer
 
     // random generator
 
     // create name
 
-    srand(1);
-    std::cout << rand() << rand() << rand() << rand() << rand() << rand() << std::endl;
 
-    srand(1);
-    std::cout << rand() << rand() << rand() << rand() << rand() << rand();
+ 
+
 
     return 0;
 }
