@@ -18,12 +18,14 @@ public:
     double sour;
     double viscosity;
     double amount; 
-    bool co2; // 0 oder 1
+    double co2; 
     double cost_permax; // in CHF
-    // colour
     double randomness;
     // only for input:
     int n;
+    // colour
+
+    std::string name;
 
     Ingrediant();
     ~Ingrediant();
@@ -47,21 +49,39 @@ Ingrediant read_input(){
 
 List read_ingreds_txt(){}
 
+Ingrediant average_drink(List& drink){
+    Ingrediant average;
+    average.name = "average";
+    for(Ingrediant i: drink){average.amount += i.amount;}
+    for(Ingrediant i: drink){
+        average.alk += i.alk*i.amount/average.amount;
+        average.sweet += i.sweet*i.amount/average.amount;
+        average.bitter += i.bitter*i.amount/average.amount;
+        average.sour += i.sour*i.amount/average.amount;
+        average.viscosity += i.viscosity*i.amount/average.amount;
+        average.co2 += i.co2*i.amount/average.amount;
+        average.cost_permax += i.cost_permax*i.amount/average.amount;
+        average.randomness += i.randomness*i.amount/average.amount;
+    }
+    return average;
+}
+
 //returns a Vector of possible ingrediants to add to the drink. Sorted from most to least fitting
 List sort_ingreds(List& ingrediants, List& drink, Ingrediant& input)
 {
-    Ingrediant Drink;
-    for(Ingrediant i: drink){
-        Drink.alk += i.alk/drink.size();
-        Drink.sweet += i.sweet/drink.size();
-        Drink.bitter += i.bitter/drink.size();
-        Drink.sour += i.sour/drink.size();
-        Drink.viscosity += i.viscosity/drink.size();
-        Drink.co2 += i.co2/drink.size();
-        Drink.cost_permax += i.bitter/drink.size();
+    Ingrediant average = average_drink(drink);
+    List sorted_ingreds;
+    std::vector<int> sorting_values;
+    double evaluation = 0;
+    double eval = 0;
+    for(Ingrediant i: ingrediants){
+        eval += pow(average.alk*average.amount/(average.amount + i.amount) + i.alk*i.amount/(average.amount + i.amount) - input.alk,2);
     }
-    
+
 }
+
+    
+
 
 // post: vector of probabilities (e^{-ax_i})
 std::vector<double> make_dist(int n_ingreds, bool randomness){
@@ -122,6 +142,10 @@ int main()
 
 
  
+
+
+
+    //test sam
 
 
     return 0;
