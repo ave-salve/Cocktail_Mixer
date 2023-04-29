@@ -68,10 +68,18 @@ List sort_ingreds(List& ingrediants, List& drink, Ingrediant& input)
     Ingrediant average = average_drink(drink);
     List sorted_ingreds;
     std::vector<int> sorting_values;
-    double evaluation = 0;
-    double eval = 0;
+    
     for(Ingrediant i: ingrediants){
+        double eval = 0;
         eval += pow(average.alk*average.amount/(average.amount + i.amount) + i.alk*i.amount/(average.amount + i.amount) - input.alk,2);
+        eval += pow(average.sweet*average.amount/(average.amount + i.amount) + i.sweet*i.amount/(average.amount + i.amount) - input.sweet,2);
+        eval += pow(average.bitter*average.amount/(average.amount + i.amount) + i.bitter*i.amount/(average.amount + i.amount) - input.bitter,2);
+        eval += pow(average.sour*average.amount/(average.amount + i.amount) + i.sour*i.amount/(average.amount + i.amount) - input.sour,2);
+        eval += pow(average.viscosity*average.amount/(average.amount + i.amount) + i.viscosity*i.amount/(average.amount + i.amount) - input.viscosity,2);
+        eval += pow(average.co2*average.amount/(average.amount + i.amount) + i.co2*i.amount/(average.amount + i.amount) - input.co2,2);
+        eval += pow(average.randomness*average.amount/(average.amount + i.amount) + i.randomness*i.amount/(average.amount + i.amount) - input.randomness,2);
+        sorted_ingreds.push_back(i);
+        sorting_values.push_back(sqrt(eval));
     }
 
 }
