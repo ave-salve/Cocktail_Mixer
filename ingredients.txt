@@ -1,1 +1,7 @@
-Limetten, //ist sehr sauer
+(hashtag is end of preamble)
+alle Eigenschaften durch abstände trennen!!
+name alk amount cost_permax | sweet sour bitter | co2 viscosity randomness
+#
+
+Limetensaft             0.0 1 0.05   0.0 1.0 0.0   0.0 0.1 0.1
+Amaretto                25  2 1.00   0.3 0.0 0.5   0.0 0.0 0.3

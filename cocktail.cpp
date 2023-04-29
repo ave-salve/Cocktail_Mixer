@@ -3,25 +3,31 @@
 #include <string>
 #include <cmath>
 #include <fstream>
+#include <ctime>
+#include <cassert>
 
 
 struct Ingrediant
 {
 public:
     // default: value between 0, 1
-
+    std::string name;
     double alk; // prozent alkohol
-    double sweet;
-    double bitter;
-    double sour;
-    double viscosity;
-    double amount; 
-    double co2; 
+    double amount;
     double cost_permax; // in CHF
+
+    double sweet;
+    double sour;
+    double bitter;
+
+    double co2;
+    double viscosity;
     double randomness;
     // colour
 
-    std::string name;
+    // only for input:
+    int n;
+
 
     Ingrediant();
     ~Ingrediant();
@@ -37,13 +43,44 @@ using List = std::vector<Ingrediant>;
 
 
 
-
+// todo
 Ingrediant read_input(){
     Ingrediant tmp;
     return tmp;
 }
 
-List read_ingreds_txt(){}
+List read_ingreds_txt(){
+    std::ifstream stream_ingr;
+    stream_ingr.open("ingredients.txt");
+    assert(stream_ingr.is_open());
+    std::string skip;
+    while(stream_ingr >> skip && !(skip == "#"));
+
+    List ingrediants;
+    
+
+    std::string tmp;
+    while(stream_ingr >> tmp){
+        Ingrediant new_one;
+        new_one.name = tmp;
+        stream_ingr >> new_one.alk;
+        stream_ingr >> new_one.amount;
+        stream_ingr >> new_one.cost_permax;
+
+        stream_ingr >> new_one.sweet;
+        stream_ingr >> new_one.sour;
+        stream_ingr >> new_one.bitter;
+        
+        stream_ingr >> new_one.co2;
+        stream_ingr >> new_one.viscosity;
+        stream_ingr >> new_one.randomness;
+
+        ingrediants.push_back(new_one);
+        std::cout << new_one.name << std::endl;
+    }
+
+    return ingrediants;
+}
 
 Ingrediant average_drink(List& drink){
     Ingrediant average;
@@ -98,16 +135,29 @@ std::vector<double> make_dist(int n_ingreds, bool randomness){
 }
 
 List select_ingreds(List& ingrediants, Ingrediant& input){
+    List drink;
     while(input.amount > 0){
         // call sort_ingreds
+        List possible_ingreds = sort_ingreds(ingrediants, drink, input);
         // call make_dist
+        std::vector<double> distribution = make_dist(possible_ingreds.size(), input.randomness);
+        // compute distribution integral
+        double integral = 0;
+        for(auto i : distribution){integral += i; }
         // radnom generator -> choose ingrediant
-        // subtract volume
-
-
-
-
+        double rand_position = (double)rand()*integral/RAND_MAX;
+        double sum_till_now;
+        for(int i = 0; i < distribution.size(); i++){
+            sum_till_now += distribution.at(i);
+            if(rand_position < sum_till_now){
+                drink.push_back(possible_ingreds.at(i));
+                input.amount -= possible_ingreds.at(i).amount;
+                break;
+            }
+        }
     }
+
+    return drink;
 }
 
 std::string give_name(List drink){
@@ -122,22 +172,12 @@ void print_drink(List drink){}
 
 int main()
 {
+    read_ingreds_txt();
+
     // desired drink: colour, volume, alkohol
     Ingrediant input = read_input();
-
-    // random generator
-
-    // create name
-
-    srand(1);
-    std::cout << rand() << rand() << rand() << rand() << rand() << rand() << std::endl;
-
-    srand(1);
-    std::cout << rand() << rand() << rand() << rand() << rand() << rand();
-
-
-    //test sam
-
+    List ingrediants; // read all ingrediants from extra file
+    srand(time(0)); // start randomizer
 
     return 0;
 }
