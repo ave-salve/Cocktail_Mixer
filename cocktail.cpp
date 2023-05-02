@@ -242,8 +242,8 @@ int main()
     //Ingrediant input = read_input();
     Ingrediant input("Test_Drink", 0.0, 1, 0.0, 0.5, 0.5, 0.0, 0.0, 0.0, 0.0, 0);
     
-    //srand(time(0)); // start randomizer
-    srand(1); //non random testing
+    srand(time(0)); // start randomizer
+    //srand(1); //non random testing
     List drink = select_ingreds(ingrediants,input);
     std::cout << "---------------------------" << std::endl;
     std::cout << "---------------------------" << std::endl;
