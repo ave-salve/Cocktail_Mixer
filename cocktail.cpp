@@ -159,7 +159,7 @@ List sort_ingreds(List& ingrediants, List& drink, Ingrediant& input)
         eval += pow(average.co2*average.amount/(average.amount + i.amount) + i.co2*i.amount/(average.amount + i.amount) - input.co2,2);
         eval += pow(average.randomness*average.amount/(average.amount + i.amount) + i.randomness*i.amount/(average.amount + i.amount) - input.randomness,2);
         sorted_ingreds.push_back(i);
-        sorting_values.push_back(sqrt(eval));
+        sorting_values.push_back(eval);
     }
 
     //sorting
@@ -190,7 +190,7 @@ std::vector<double> make_dist(int n_ingreds, double randomness){
     std::vector<double> dist;
     double alpha = randomness*0.5*n_ingreds;
     for(int i = 0; i < n_ingreds; i++){
-        dist.push_back(exp(-alpha*i/(n_ingreds-1)));
+        dist.push_back(exp(-(alpha*i/(n_ingreds-1))));
     }
     return dist;
 }
@@ -208,7 +208,7 @@ List select_ingreds(List& ingrediants, Ingrediant& input){
         for(auto i : distribution){integral += i; }
         // radnom generator -> choose ingrediant
         double rand_position = (double)rand()*integral/RAND_MAX;
-        double sum_till_now;
+        double sum_till_now = 0;
         for(int i = 0; i < distribution.size(); i++){
             sum_till_now += distribution.at(i);
             if(rand_position < sum_till_now){
@@ -240,7 +240,7 @@ int main()
 
     // desired drink: colour, volume, alkohol
     //Ingrediant input = read_input();
-    Ingrediant input("Test_Drink", 0.0, 1, 0.0, 0.5, 0.5, 0.0, 0.0, 0.0, 0.0, 0);
+    Ingrediant input("Test_Drink", 0.0, 1, 0.0, 0.5, 0.5, 0.0, 0.0, 0.0, 0.1, 0);
     
     srand(time(0)); // start randomizer
     //srand(1); //non random testing
