@@ -5,7 +5,8 @@
 #include <fstream>
 #include <ctime>
 #include <cassert>
-
+//#include "pbPlots.hpp" only for plotting
+//#include "supportLib.hpp" only for plotting
 
 struct Ingrediant
 {
@@ -30,20 +31,52 @@ public:
 
     Ingrediant(std::string na, double al, double am, double co, double sw, double so, double bi, double co2_, double vi, double ra, int n_);
     Ingrediant();
+
+    void print();
     
 };
+
 Ingrediant::Ingrediant(std::string na, double al, double am, double co, double sw, double so, double bi, double co2_, double vi, double ra, int n_)
     : name(na), alk(al), amount(am), cost_permax(co), sweet(sw), sour(so), bitter(bi), co2(co2_), viscosity(vi), randomness(ra), n(n_)
-{
-}
+{}
+
 Ingrediant::Ingrediant()
     : name(""), alk(0), amount(0), cost_permax(0), sweet(0), sour(0), bitter(0), co2(0), viscosity(0), randomness(0), n(0)
-{  
-}
+{}
+
+void Ingrediant::print(){
+    std::cout << "---------------------------" << std::endl;
+    std::cout << "Name:     " << name << std::endl;
+    std::cout << "Alc:      " << alk << std::endl;
+    std::cout << "Amount:   " << amount << std::endl;
+    std::cout << "Cost:     " << cost_permax << std::endl;
+    std::cout << "Sweet:    " << sweet << std::endl;
+    std::cout << "Sour:     " << sour << std::endl;
+    std::cout << "Bitter:   " << bitter << std::endl;
+    std::cout << "Co2:      " << co2 << std::endl;
+    std::cout << "Viscos:   " << viscosity << std::endl;
+    std::cout << "Random:   " << randomness << std::endl;
+    std::cout << "---------------------------" << std::endl;
+} 
+
 
 using List = std::vector<Ingrediant>;
 
-
+/* //Plotting Distribution
+void draw_dist_plot(std::vector<double> x){
+	StringReference *errorMessage = CreateStringReferenceLengthValue(0, L' ');
+    RGBABitmapImageReference *imageReference = CreateRGBABitmapImageReference();
+    std::vector<double> y;
+    for(int i = 0; i < x.size(); ++i){
+        y.push_back((double)i/(double)x.size());
+    }
+    DrawScatterPlot(imageReference, 600, 400, &x, &y, errorMessage);
+    std::vector<double> *pngdata = ConvertToPNG(imageReference->image);
+	WriteToFile(pngdata, "dist_plot.png");
+	DeleteImage(imageReference->image);
+    FreeAllocations();
+}
+*/
 
 // todo
 Ingrediant read_input(){
@@ -101,6 +134,13 @@ Ingrediant average_drink(List& drink){
     return average;
 }
 
+//checks if ingrediant I is already in list D
+bool ingred_duplicate(Ingrediant I, List D){
+    for(auto i : D){
+        if(i.name == I.name){return true;}
+    }
+    return false;
+}
 
 //returns a Vector of possible ingrediants to add to the drink. Sorted from most to least fitting
 List sort_ingreds(List& ingrediants, List& drink, Ingrediant& input)
@@ -126,7 +166,7 @@ List sort_ingreds(List& ingrediants, List& drink, Ingrediant& input)
     int n = sorting_values.size();
     for(int i = 0; i < n; ++i){
         for(int j = 1; j < n; ++j){
-            if(sorting_values.at(i) < sorting_values.at(j)){
+            if(sorting_values.at(i) > sorting_values.at(j)){
                 std::swap(sorting_values.at(i),sorting_values.at(j));
                 std::swap(sorted_ingreds.at(i),sorted_ingreds.at(j));
             }
@@ -146,7 +186,7 @@ List sort_ingreds(List& ingrediants, List& drink, Ingrediant& input)
 
 
 // post: vector of probabilities (e^{-ax_i})
-std::vector<double> make_dist(int n_ingreds, bool randomness){
+std::vector<double> make_dist(int n_ingreds, double randomness){
     std::vector<double> dist;
     double alpha = randomness*0.5*n_ingreds;
     for(int i = 0; i < n_ingreds; i++){
@@ -162,6 +202,7 @@ List select_ingreds(List& ingrediants, Ingrediant& input){
         List possible_ingreds = sort_ingreds(ingrediants, drink, input);
         // call make_dist
         std::vector<double> distribution = make_dist(possible_ingreds.size(), input.randomness);
+        //draw_dist_plot(distribution); Plott distribution function
         // compute distribution integral
         double integral = 0;
         for(auto i : distribution){integral += i; }
@@ -171,7 +212,7 @@ List select_ingreds(List& ingrediants, Ingrediant& input){
         for(int i = 0; i < distribution.size(); i++){
             sum_till_now += distribution.at(i);
             if(rand_position < sum_till_now){
-                possible_ingreds.at(i).n = -1; //indicates that this ingrediant has already been used once
+                if(ingred_duplicate(possible_ingreds.at(i), drink)){break;}
                 drink.push_back(possible_ingreds.at(i));
                 input.amount -= possible_ingreds.at(i).amount;
                 break;
@@ -199,17 +240,21 @@ int main()
 
     // desired drink: colour, volume, alkohol
     //Ingrediant input = read_input();
-    Ingrediant input("Test_Drink", 0.2, 1, 0.0, 0.4, 0.1, 0.0, 0.0, 0.3, 0.0, 0);
+    Ingrediant input("Test_Drink", 0.0, 1, 0.0, 0.5, 0.5, 0.0, 0.0, 0.0, 0.0, 0);
     
-    srand(time(0)); // start randomizer
+    //srand(time(0)); // start randomizer
+    srand(1); //non random testing
     List drink = select_ingreds(ingrediants,input);
-
+    std::cout << "---------------------------" << std::endl;
+    std::cout << "---------------------------" << std::endl;
     std::cout << "The Cocktail Ingrediants are:" << std::endl;
-
+    std::cout << "---------------------------" << std::endl;
     for(auto i : drink){
         std::cout << i.name << std::endl;
     }
-
+    std::cout << "---------------------------" << std::endl;
+    average_drink(drink).print();
+    std::cout << "---------------------------" << std::endl;
 
     return 0;
 }
