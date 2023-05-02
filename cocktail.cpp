@@ -28,15 +28,17 @@ public:
     // only for input:
     int n;
 
-
+    Ingrediant(std::string na, double al, double am, double co, double sw, double so, double bi, double co2_, double vi, double ra, int n_);
     Ingrediant();
-    ~Ingrediant();
+    
 };
-Ingrediant::Ingrediant(/* args */)
+Ingrediant::Ingrediant(std::string na, double al, double am, double co, double sw, double so, double bi, double co2_, double vi, double ra, int n_)
+    : name(na), alk(al), amount(am), cost_permax(co), sweet(sw), sour(so), bitter(bi), co2(co2_), viscosity(vi), randomness(ra), n(n_)
 {
 }
-Ingrediant::~Ingrediant()
-{
+Ingrediant::Ingrediant()
+    : name(""), alk(0), amount(0), cost_permax(0), sweet(0), sour(0), bitter(0), co2(0), viscosity(0), randomness(0), n(0)
+{  
 }
 
 using List = std::vector<Ingrediant>;
@@ -76,7 +78,7 @@ List read_ingreds_txt(){
         stream_ingr >> new_one.randomness;
 
         ingrediants.push_back(new_one);
-        std::cout << new_one.name << std::endl;
+        //std::cout << new_one.name << std::endl;
     }
 
     return ingrediants;
@@ -99,12 +101,13 @@ Ingrediant average_drink(List& drink){
     return average;
 }
 
+
 //returns a Vector of possible ingrediants to add to the drink. Sorted from most to least fitting
 List sort_ingreds(List& ingrediants, List& drink, Ingrediant& input)
 {
     Ingrediant average = average_drink(drink);
     List sorted_ingreds;
-    std::vector<int> sorting_values;
+    std::vector<double> sorting_values;
     
     for(Ingrediant i: ingrediants){
         double eval = 0;
@@ -119,6 +122,24 @@ List sort_ingreds(List& ingrediants, List& drink, Ingrediant& input)
         sorting_values.push_back(sqrt(eval));
     }
 
+    //sorting
+    int n = sorting_values.size();
+    for(int i = 0; i < n; ++i){
+        for(int j = 1; j < n; ++j){
+            if(sorting_values.at(i) < sorting_values.at(j)){
+                std::swap(sorting_values.at(i),sorting_values.at(j));
+                std::swap(sorted_ingreds.at(i),sorted_ingreds.at(j));
+            }
+        }
+    }
+
+    
+
+
+
+
+
+    return sorted_ingreds;
 }
 
     
@@ -150,6 +171,7 @@ List select_ingreds(List& ingrediants, Ingrediant& input){
         for(int i = 0; i < distribution.size(); i++){
             sum_till_now += distribution.at(i);
             if(rand_position < sum_till_now){
+                possible_ingreds.at(i).n = -1; //indicates that this ingrediant has already been used once
                 drink.push_back(possible_ingreds.at(i));
                 input.amount -= possible_ingreds.at(i).amount;
                 break;
@@ -172,12 +194,22 @@ void print_drink(List drink){}
 
 int main()
 {
-    read_ingreds_txt();
+    //Read the list of ingrediants from the file
+    List ingrediants = read_ingreds_txt();
 
     // desired drink: colour, volume, alkohol
-    Ingrediant input = read_input();
-    List ingrediants; // read all ingrediants from extra file
+    //Ingrediant input = read_input();
+    Ingrediant input("Test_Drink", 0.2, 1, 0.0, 0.4, 0.1, 0.0, 0.0, 0.3, 0.0, 0);
+    
     srand(time(0)); // start randomizer
+    List drink = select_ingreds(ingrediants,input);
+
+    std::cout << "The Cocktail Ingrediants are:" << std::endl;
+
+    for(auto i : drink){
+        std::cout << i.name << std::endl;
+    }
+
 
     return 0;
 }
