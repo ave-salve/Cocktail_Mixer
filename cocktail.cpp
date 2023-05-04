@@ -1,12 +1,13 @@
 #include <iostream>
+#include <iomanip>
 #include <vector>
 #include <string>
 #include <cmath>
 #include <fstream>
 #include <ctime>
 #include <cassert>
-//#include "pbPlots.hpp" only for plotting
-//#include "supportLib.hpp" only for plotting
+//#include "pbPlots.hpp" //only for plotting
+//#include "supportLib.hpp" //only for plotting
 
 struct Ingrediant
 {
@@ -62,17 +63,18 @@ void Ingrediant::print(){
 
 using List = std::vector<Ingrediant>;
 
-/* //Plotting Distribution
-void draw_dist_plot(std::vector<double> x){
+/*    //Plotting Distribution
+void draw_dist_plot(std::vector<double> x, std::string png_name){
 	StringReference *errorMessage = CreateStringReferenceLengthValue(0, L' ');
     RGBABitmapImageReference *imageReference = CreateRGBABitmapImageReference();
     std::vector<double> y;
     for(int i = 0; i < x.size(); ++i){
-        y.push_back((double)i/(double)x.size());
+        //y.push_back((double)i/(double)x.size());
+        y.push_back(i);
     }
-    DrawScatterPlot(imageReference, 600, 400, &x, &y, errorMessage);
+    DrawScatterPlot(imageReference, 600, 400, &y, &x, errorMessage);
     std::vector<double> *pngdata = ConvertToPNG(imageReference->image);
-	WriteToFile(pngdata, "dist_plot.png");
+	WriteToFile(pngdata, png_name);
 	DeleteImage(imageReference->image);
     FreeAllocations();
 }
@@ -95,6 +97,7 @@ List read_ingreds_txt(){
     
 
     std::string tmp;
+    int number = 1;
     while(stream_ingr >> tmp){
         Ingrediant new_one;
         new_one.name = tmp;
@@ -110,7 +113,9 @@ List read_ingreds_txt(){
         stream_ingr >> new_one.viscosity;
         stream_ingr >> new_one.randomness;
 
+        new_one.n = number;
         ingrediants.push_back(new_one);
+        ++number;
         //std::cout << new_one.name << std::endl;
     }
 
@@ -145,19 +150,26 @@ bool ingred_duplicate(Ingrediant I, List D){
 //returns a Vector of possible ingrediants to add to the drink. Sorted from most to least fitting
 List sort_ingreds(List& ingrediants, List& drink, Ingrediant& input)
 {
-    Ingrediant average = average_drink(drink);
+    Ingrediant average;
     List sorted_ingreds;
     std::vector<double> sorting_values;
     
     for(Ingrediant i: ingrediants){
         double eval = 0;
-        eval += pow(average.alk*average.amount/(average.amount + i.amount) + i.alk*i.amount/(average.amount + i.amount) - input.alk,2);
-        eval += pow(average.sweet*average.amount/(average.amount + i.amount) + i.sweet*i.amount/(average.amount + i.amount) - input.sweet,2);
-        eval += pow(average.bitter*average.amount/(average.amount + i.amount) + i.bitter*i.amount/(average.amount + i.amount) - input.bitter,2);
-        eval += pow(average.sour*average.amount/(average.amount + i.amount) + i.sour*i.amount/(average.amount + i.amount) - input.sour,2);
-        eval += pow(average.viscosity*average.amount/(average.amount + i.amount) + i.viscosity*i.amount/(average.amount + i.amount) - input.viscosity,2);
-        eval += pow(average.co2*average.amount/(average.amount + i.amount) + i.co2*i.amount/(average.amount + i.amount) - input.co2,2);
-        eval += pow(average.randomness*average.amount/(average.amount + i.amount) + i.randomness*i.amount/(average.amount + i.amount) - input.randomness,2);
+        drink.push_back(i);
+        average = average_drink(drink);
+        drink.pop_back();
+
+        eval += fabs(average.alk - i.alk);
+        eval += fabs(average.sweet - i.sweet);
+        eval += fabs(average.sour  - i.sour);
+        eval += fabs(average.bitter - i.bitter);
+        eval += fabs(average.co2 - i.co2);
+        eval += fabs(average.viscosity - i.viscosity)/2.0;
+
+
+        if(average.co2 > 40 && 60 > average.co2){eval += 2;}
+         
         sorted_ingreds.push_back(i);
         sorting_values.push_back(eval);
     }
@@ -165,7 +177,7 @@ List sort_ingreds(List& ingrediants, List& drink, Ingrediant& input)
     //sorting
     int n = sorting_values.size();
     for(int i = 0; i < n; ++i){
-        for(int j = 1; j < n; ++j){
+        for(int j = i+1; j < n; ++j){
             if(sorting_values.at(i) > sorting_values.at(j)){
                 std::swap(sorting_values.at(i),sorting_values.at(j));
                 std::swap(sorted_ingreds.at(i),sorted_ingreds.at(j));
@@ -178,7 +190,7 @@ List sort_ingreds(List& ingrediants, List& drink, Ingrediant& input)
 
 
 
-
+    //draw_dist_plot(sorting_values, "sorted_values_plot.png"); //Plott distribution function
     return sorted_ingreds;
 }
 
@@ -202,7 +214,7 @@ List select_ingreds(List& ingrediants, Ingrediant& input){
         List possible_ingreds = sort_ingreds(ingrediants, drink, input);
         // call make_dist
         std::vector<double> distribution = make_dist(possible_ingreds.size(), input.randomness);
-        //draw_dist_plot(distribution); Plott distribution function
+        //draw_dist_plot(distribution, "dist_plot.png"); //Plott distribution function
         // compute distribution integral
         double integral = 0;
         for(auto i : distribution){integral += i; }
@@ -240,7 +252,7 @@ int main()
 
     // desired drink: colour, volume, alkohol
     //Ingrediant input = read_input();
-    Ingrediant input("Test_Drink", 0.0, 1, 0.0, 0.5, 0.5, 0.0, 0.0, 0.0, 0.1, 0);
+    Ingrediant input("Test_Drink", 0.15, 1, 0.0, 0.5, 0.0, 0.0, 0, 0.1, 0.4, 0);
     
     srand(time(0)); // start randomizer
     //srand(1); //non random testing
@@ -250,7 +262,7 @@ int main()
     std::cout << "The Cocktail Ingrediants are:" << std::endl;
     std::cout << "---------------------------" << std::endl;
     for(auto i : drink){
-        std::cout << i.name << std::endl;
+        std::cout << std::setw(5) << i.amount*150 << " ml |" << i.name << std::endl;
     }
     std::cout << "---------------------------" << std::endl;
     average_drink(drink).print();
